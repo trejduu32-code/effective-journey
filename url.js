@@ -7,7 +7,7 @@
             const defaultConfig = {
                 buttonImage: 'https://trejduu32-code.github.io/effective-journey/url.jpeg',
                 position: 'bottom-right',
-                defaultService: 'tinyurl'
+                defaultService: 'urlgpt'
             };
             
             const config = Object.assign({}, defaultConfig, window.URLShortenerConfig || {});
@@ -227,3 +227,4 @@
         // ========== WIDGET CODE END ==========
     </script>
     <!-- ========== COPY TO HERE FOR WIDGET.JS ========== -->
+
