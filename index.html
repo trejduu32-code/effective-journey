@@ -1,0 +1,230 @@
+<script>
+// ========== DRAGGABLE WIDGET ==========
+(function () {
+    'use strict';
+
+    const defaultConfig = {
+        buttonImage: 'https://trejduu32-code.github.io/effective-journey/url.jpeg',
+        defaultService: 'tinyurl'
+    };
+
+    const config = Object.assign({}, defaultConfig, window.URLShortenerConfig || {});
+
+    /* Load Tailwind first */
+    function loadTailwind(callback) {
+        if (window.tailwind) return callback();
+        const s = document.createElement("script");
+        s.src = "https://cdn.tailwindcss.com";
+        s.onload = callback;
+        document.head.appendChild(s);
+    }
+
+    /* Inject custom CSS */
+    function injectStyles() {
+        if (document.getElementById("drag-widget-styles")) return;
+
+        const st = document.createElement("style");
+        st.id = "drag-widget-styles";
+        st.textContent = `
+            .url-widget-glass { background: rgba(15,23,42,.95); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.1); }
+            .url-widget-animated-bg { background: linear-gradient(135deg,#ef4444,#991b1b); }
+            .url-widget-tab.active { background: linear-gradient(135deg,#ef4444,#991b1b); color:white; }
+            @keyframes slideUp { from { transform: translateY(20px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+            .slideUp { animation: slideUp .25s ease-out; }
+            /* DRAG HANDLE */
+            .drag-handle { cursor: grab; user-select:none; }
+            .drag-handle:active { cursor: grabbing; }
+        `;
+        document.head.appendChild(st);
+    }
+
+    /* Create widget structure */
+    function createWidget() {
+        document.body.insertAdjacentHTML("beforeend", `
+            <div id="urlFloatWidget" class="fixed z-[999999] left-4 bottom-4" style="touch-action:none;">
+                
+                <div id="urlWidgetPanel" class="hidden mb-4 url-widget-glass rounded-2xl p-6 w-96 shadow-xl slideUp">
+                    
+                    <div class="flex items-center justify-between mb-4 drag-handle">
+                        <h3 class="text-white font-bold text-base select-none">Quick URL Shortener</h3>
+                        <button id="urlWidgetClose" class="text-gray-400 hover:text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex gap-2 mb-4 bg-white/5 p-1 rounded-lg">
+                        <button id="tabTinyURL" class="url-widget-tab active flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-300 hover:text-white">TinyURL</button>
+                        <button id="tabURLGPT" class="url-widget-tab flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-300 hover:text-white">URLGPT</button>
+                    </div>
+
+                    <div id="serviceTinyURL">
+                        <form id="urlForm" class="space-y-3">
+                            <input id="urlInput" type="url" placeholder="https://example.com" required 
+                                class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm placeholder-gray-500 focus:ring-2 focus:ring-red-600">
+                            <button id="urlSubmit" class="w-full py-2 px-4 rounded-lg text-white url-widget-animated-bg hover:scale-105 transition">Shorten</button>
+                        </form>
+
+                        <div id="resultBox" class="hidden mt-4">
+                            <div class="bg-white/10 p-3 rounded-lg">
+                                <p class="text-xs text-gray-400">Shortened URL:</p>
+                                <div class="flex gap-2">
+                                    <a id="shortLink" target="_blank" class="flex-1 text-red-400 text-xs break-all font-mono"></a>
+                                    <button id="copyBtn" class="px-3 py-1 bg-red-600 text-white rounded text-xs">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="errorBox" class="hidden mt-3">
+                            <p id="errorMsg" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 p-2 rounded-lg"></p>
+                        </div>
+                    </div>
+
+                    <div id="serviceURLGPT" class="hidden">
+                        <iframe src="https://urlgpt.base44.app/Embed" class="w-full h-[180px] rounded-lg" style="border:none;"></iframe>
+                    </div>
+
+                </div>
+
+                <button id="floatButton" class="w-16 h-16 rounded-full shadow-xl overflow-hidden bg-black border-2 border-red-600 hover:scale-110 transition">
+                    <img src="${config.buttonImage}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='🔗'">
+                </button>
+
+            </div>
+        `);
+    }
+
+    /* DRAG FUNCTIONALITY */
+    function makeDraggable() {
+        const box = document.getElementById("urlFloatWidget");
+        const handle = box; // draggable entire widget including button & panel
+
+        let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+        let dragging = false;
+
+        function startDrag(e) {
+            dragging = true;
+            mouseX = (e.touches ? e.touches[0].clientX : e.clientX);
+            mouseY = (e.touches ? e.touches[0].clientY : e.clientY);
+        }
+
+        function onDrag(e) {
+            if (!dragging) return;
+
+            const x = (e.touches ? e.touches[0].clientX : e.clientX);
+            const y = (e.touches ? e.touches[0].clientY : e.clientY);
+
+            posX += x - mouseX;
+            posY += y - mouseY;
+
+            mouseX = x;
+            mouseY = y;
+
+            box.style.transform = `translate(${posX}px, ${posY}px)`;
+        }
+
+        function stopDrag() {
+            dragging = false;
+        }
+
+        handle.addEventListener("mousedown", startDrag);
+        handle.addEventListener("touchstart", startDrag);
+
+        window.addEventListener("mousemove", onDrag);
+        window.addEventListener("touchmove", onDrag, { passive: false });
+
+        window.addEventListener("mouseup", stopDrag);
+        window.addEventListener("touchend", stopDrag);
+    }
+
+    /* Initialize logic */
+    function initializeWidget() {
+        const panel = document.getElementById("urlWidgetPanel");
+        const btn = document.getElementById("floatButton");
+        const close = document.getElementById("urlWidgetClose");
+
+        const tabTiny = document.getElementById("tabTinyURL");
+        const tabGPT = document.getElementById("tabURLGPT");
+        const tinyBox = document.getElementById("serviceTinyURL");
+        const gptBox = document.getElementById("serviceURLGPT");
+
+        const form = document.getElementById("urlForm");
+        const input = document.getElementById("urlInput");
+        const submit = document.getElementById("urlSubmit");
+
+        const result = document.getElementById("resultBox");
+        const errorBox = document.getElementById("errorBox");
+        const errorMsg = document.getElementById("errorMsg");
+        const shortLink = document.getElementById("shortLink");
+        const copyBtn = document.getElementById("copyBtn");
+
+        function togglePanel() {
+            panel.classList.toggle("hidden");
+            if (!panel.classList.contains("hidden")) input.focus();
+        }
+
+        btn.onclick = togglePanel;
+        close.onclick = togglePanel;
+
+        /* Switch Tabs */
+        function setTab(s) {
+            const tiny = s === "tiny";
+            tabTiny.classList.toggle("active", tiny);
+            tabGPT.classList.toggle("active", !tiny);
+            tinyBox.classList.toggle("hidden", !tiny);
+            gptBox.classList.toggle("hidden", tiny);
+            result.classList.add("hidden");
+            errorBox.classList.add("hidden");
+        }
+
+        tabTiny.onclick = () => setTab("tiny");
+        tabGPT.onclick = () => setTab("gpt");
+
+        /* Form submit */
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+
+            const url = input.value.trim();
+            if (!url) return;
+
+            submit.textContent = "Shortening...";
+            submit.disabled = true;
+
+            fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(url))
+                .then(r => r.text())
+                .then(short => {
+                    shortLink.textContent = short;
+                    shortLink.href = short;
+                    result.classList.remove("hidden");
+                })
+                .catch(() => {
+                    errorMsg.textContent = "Failed to shorten URL.";
+                    errorBox.classList.remove("hidden");
+                })
+                .finally(() => {
+                    submit.textContent = "Shorten";
+                    submit.disabled = false;
+                });
+        });
+
+        /* Copy btn */
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(shortLink.textContent)
+                .then(() => {
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => copyBtn.textContent = "Copy", 2000);
+                });
+        };
+    }
+
+    /* MAIN INIT */
+    loadTailwind(() => {
+        injectStyles();
+        createWidget();
+        initializeWidget();
+        makeDraggable();
+    });
+
+})();
+</script>
