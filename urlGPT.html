@@ -3,7 +3,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>URL Shortener - Fast &amp; Free Link Shortening Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://trejduu32-code.github.io/effective-journey/url.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -152,6 +151,15 @@
             </div>
             
             <div class="space-y-4">
+                <!-- Step 1 -->
+                <div class="bg-white/5 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="bg-purple-600 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">1</span>
+                        <h3 class="text-white font-semibold">Host the Widget File</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-3">Upload <code class="bg-black/30 px-2 py-1 rounded text-purple-300 text-xs">url-shortener-widget.js</code> to your web server</p>
+                </div>
+                
                 <!-- Step 2 -->
                 <div class="bg-white/5 rounded-lg p-4">
                     <div class="flex items-center gap-2 mb-3">
@@ -160,14 +168,29 @@
                     </div>
                     <p class="text-gray-400 text-sm mb-3">Add this <strong class="text-purple-400">single line</strong> before <code class="bg-black/30 px-2 py-1 rounded text-purple-300 text-xs">&lt;/body&gt;</code>:</p>
                     <div class="relative group">
-                        <pre class="bg-black/40 rounded-lg p-4 overflow-x-auto text-sm"><code class="text-green-400">&lt;script src=&#34;https://trejduu32-code.github.io/effective-journey/url.js&#34;&gt;&lt;/script&gt;</code></pre>
+                        <pre class="bg-black/40 rounded-lg p-4 overflow-x-auto text-sm"><code class="text-green-400">&lt;script src=&#34;https://yoursite.com/url-shortener-widget.js&#34;&gt;&lt;/script&gt;</code></pre>
                         <button onclick="copyIntegrationCode()" class="absolute top-2 right-2 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-all duration-300">
                             Copy
                         </button>
                     </div>
                 </div>
                 
-               
+                <!-- Step 3 (Optional) -->
+                <div class="bg-white/5 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="bg-purple-600/50 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">3</span>
+                        <h3 class="text-white font-semibold">Customize (Optional)</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-3">Customize position and default service:</p>
+                    <div class="relative group">
+                        <pre class="bg-black/40 rounded-lg p-4 overflow-x-auto text-sm"><code class="text-gray-300"><span class="text-pink-400">&lt;script&gt;</span>
+  <span class="text-blue-400">window</span>.<span class="text-yellow-400">URLShortenerConfig</span> = {
+    <span class="text-cyan-400">position</span>: <span class="text-green-400">&#39;bottom-right&#39;</span>, <span class="text-gray-500">// or bottom-left, top-right, top-left</span>
+    <span class="text-cyan-400">defaultService</span>: <span class="text-green-400">&#39;tinyurl&#39;</span> <span class="text-gray-500">// or &#39;urlgpt&#39;</span>
+  };
+<span class="text-pink-400">&lt;/script&gt;</span>
+<span class="text-pink-400">&lt;script</span> <span class="text-cyan-400">src</span>=<span class="text-green-400">&#34;url-shortener-widget.js&#34;</span><span class="text-pink-400">&gt;&lt;/script&gt;</span></code></pre>
+                    </div>
                 </div>
                 
                 <!-- Features -->
@@ -446,8 +469,238 @@
             
             return date.toLocaleDateString();
         }
-     </script>
-    <script src="https://trejduu32-code.github.io/effective-journey/url.js"></script>
+    
+
+    <!-- ========== COPY FROM HERE FOR WIDGET.JS ========== -->
+    <script>
+        // ========== WIDGET CODE START ==========
+        (function() {
+            'use strict';
+            
+            const defaultConfig = {
+                buttonImage: 'https://trejduu32-code.github.io/effective-journey/url.jpeg',
+                position: 'bottom-right',
+                defaultService: 'tinyurl'
+            };
+            
+            const config = Object.assign({}, defaultConfig, window.URLShortenerConfig || {});
+            
+            function injectTailwind() {
+                if (!document.querySelector('script[src*="tailwindcss"]')) {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.tailwindcss.com';
+                    document.head.appendChild(script);
+                }
+            }
+            
+            function injectStyles() {
+                const styleId = 'url-shortener-widget-styles';
+                if (document.getElementById(styleId)) return;
+                
+                const style = document.createElement('style');
+                style.id = styleId;
+                style.textContent = `
+                    .url-widget-glass { background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+                    .url-widget-glow { box-shadow: 0 0 20px rgba(102,126,234,0.5); }
+                    .url-widget-animated-bg { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
+                    .url-widget-tab { transition: all 0.3s; cursor: pointer; }
+                    .url-widget-tab.active { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; }
+                    @keyframes url-widget-slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                    .url-widget-slide-up { animation: url-widget-slide-up 0.3s ease-out; }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            function createWidget() {
+                const posClasses = {'bottom-right':'bottom-6 right-6','bottom-left':'bottom-6 left-6','top-right':'top-6 right-6','top-left':'top-6 left-6'};
+                const container = document.getElementById('urlShortenerWidgetContainer') || document.body;
+                
+                container.insertAdjacentHTML('beforeend', `
+                    <div id="urlShortenerWidget" class="fixed ${posClasses[config.position]||posClasses['bottom-right']} z-50" style="z-index:999999;">
+                        <div id="urlWidgetPanel" class="hidden mb-4 url-widget-glass rounded-2xl p-6 w-96 shadow-2xl url-widget-slide-up">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-white font-bold text-base">Quick URL Shortener</h3>
+                                <button id="urlWidgetClose" class="text-gray-400 hover:text-white transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            
+                            <div class="flex gap-2 mb-4 bg-white/5 rounded-lg p-1">
+                                <button id="urlWidgetTabTinyurl" class="url-widget-tab flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-400 hover:text-white active">TinyURL</button>
+                                <button id="urlWidgetTabUrlgpt" class="url-widget-tab flex-1 py-2 px-3 rounded-md text-sm font-medium text-gray-400 hover:text-white">URLGpt</button>
+                            </div>
+                            
+                            <div id="urlWidgetServiceTinyurl" class="url-widget-service">
+                                <form id="urlWidgetForm" class="space-y-3">
+                                    <input type="url" id="urlWidgetInput" placeholder="https://example.com/long-url" required class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                                    <button type="submit" id="urlWidgetSubmit" class="w-full py-2 px-4 url-widget-animated-bg text-white font-semibold rounded-lg hover:scale-105 transform transition-all duration-300 text-sm">Shorten URL</button>
+                                </form>
+                                <div id="urlWidgetResult" class="mt-4 hidden">
+                                    <div class="bg-white/10 rounded-lg p-3 space-y-2">
+                                        <p class="text-xs text-gray-400">Shortened URL:</p>
+                                        <div class="flex gap-2">
+                                            <a id="urlWidgetShortUrl" href="#" target="_blank" class="flex-1 text-purple-400 font-mono text-xs break-all hover:text-purple-300 transition-colors"></a>
+                                            <button id="urlWidgetCopy" class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs transition-all flex-shrink-0">Copy</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="urlWidgetError" class="mt-4 hidden">
+                                    <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                                        <p class="text-red-400 text-xs" id="urlWidgetErrorMsg"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="urlWidgetServiceUrlgpt" class="url-widget-service hidden">
+                                <div class="bg-white/5 rounded-lg p-3 mb-3">
+                                    <p class="text-gray-400 text-xs mb-2"><svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>Powered by URLGPT</p>
+                                </div>
+                                <iframe id="urlWidgetIframe" src="https://urlgpt.base44.app/Embed" style="width:100%;height:180px;border:none;border-radius:8px;background:transparent;" title="URLGpt Shortener"></iframe>
+                            </div>
+                        </div>
+                        
+                        <button id="urlWidgetButton" class="w-16 h-16 rounded-full shadow-2xl hover:scale-110 transform transition-all duration-300 url-widget-glow overflow-hidden bg-gray-900 border-2 border-red-500" title="Quick URL Shortener">
+                            <img src="${config.buttonImage}" alt="URL Shortener" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\\"text-2xl\\">🔗</span>'">
+                        </button>
+                    </div>
+                `);
+            }
+            
+            function initializeWidget() {
+                const panel = document.getElementById('urlWidgetPanel');
+                const button = document.getElementById('urlWidgetButton');
+                const closeBtn = document.getElementById('urlWidgetClose');
+                const form = document.getElementById('urlWidgetForm');
+                const input = document.getElementById('urlWidgetInput');
+                const submitBtn = document.getElementById('urlWidgetSubmit');
+                const resultDiv = document.getElementById('urlWidgetResult');
+                const errorDiv = document.getElementById('urlWidgetError');
+                const shortUrlLink = document.getElementById('urlWidgetShortUrl');
+                const copyBtn = document.getElementById('urlWidgetCopy');
+                const errorMsg = document.getElementById('urlWidgetErrorMsg');
+                const tabTinyurl = document.getElementById('urlWidgetTabTinyurl');
+                const tabUrlgpt = document.getElementById('urlWidgetTabUrlgpt');
+                const serviceTinyurl = document.getElementById('urlWidgetServiceTinyurl');
+                const serviceUrlgpt = document.getElementById('urlWidgetServiceUrlgpt');
+                
+                let currentService = config.defaultService;
+                
+                function switchService(service) {
+                    currentService = service;
+                    if (service === 'tinyurl') {
+                        tabTinyurl.classList.add('active');
+                        tabUrlgpt.classList.remove('active');
+                        serviceTinyurl.classList.remove('hidden');
+                        serviceUrlgpt.classList.add('hidden');
+                    } else {
+                        tabUrlgpt.classList.add('active');
+                        tabTinyurl.classList.remove('active');
+                        serviceUrlgpt.classList.remove('hidden');
+                        serviceTinyurl.classList.add('hidden');
+                    }
+                    form.reset();
+                    resultDiv.classList.add('hidden');
+                    errorDiv.classList.add('hidden');
+                }
+                
+                tabTinyurl.addEventListener('click', () => switchService('tinyurl'));
+                tabUrlgpt.addEventListener('click', () => switchService('urlgpt'));
+                switchService(currentService);
+                
+                function togglePanel() {
+                    if (panel.classList.contains('hidden')) {
+                        panel.classList.remove('hidden');
+                        button.classList.add('scale-95');
+                        if (currentService === 'tinyurl') input.focus();
+                    } else {
+                        panel.classList.add('hidden');
+                        button.classList.remove('scale-95');
+                        form.reset();
+                        resultDiv.classList.add('hidden');
+                        errorDiv.classList.add('hidden');
+                    }
+                }
+                
+                button.addEventListener('click', togglePanel);
+                closeBtn.addEventListener('click', togglePanel);
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const url = input.value.trim();
+                    if (!url) return;
+                    
+                    submitBtn.textContent = 'Shortening...';
+                    submitBtn.disabled = true;
+                    errorDiv.classList.add('hidden');
+                    
+                    const apiUrl = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url);
+                    
+                    fetch(apiUrl)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Failed to shorten URL');
+                            return response.text();
+                        })
+                        .then(shortUrl => {
+                            shortUrlLink.href = shortUrl;
+                            shortUrlLink.textContent = shortUrl;
+                            resultDiv.classList.remove('hidden');
+                            errorDiv.classList.add('hidden');
+                            submitBtn.textContent = 'Shorten URL';
+                            submitBtn.disabled = false;
+                            form.reset();
+                        })
+                        .catch(error => {
+                            errorMsg.textContent = error.message || 'Invalid URL. Please try again.';
+                            errorDiv.classList.remove('hidden');
+                            resultDiv.classList.add('hidden');
+                            submitBtn.textContent = 'Shorten URL';
+                            submitBtn.disabled = false;
+                        });
+                });
+                
+                copyBtn.addEventListener('click', function() {
+                    const url = shortUrlLink.textContent;
+                    navigator.clipboard.writeText(url)
+                        .then(() => {
+                            const originalText = copyBtn.textContent;
+                            copyBtn.textContent = 'Copied!';
+                            copyBtn.classList.add('bg-green-600');
+                            copyBtn.classList.remove('bg-purple-600');
+                            setTimeout(() => {
+                                copyBtn.textContent = originalText;
+                                copyBtn.classList.remove('bg-green-600');
+                                copyBtn.classList.add('bg-purple-600');
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy:', err);
+                            alert('Failed to copy URL');
+                        });
+                });
+            }
+            
+            function init() {
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        injectTailwind();
+                        injectStyles();
+                        createWidget();
+                        initializeWidget();
+                    });
+                } else {
+                    injectTailwind();
+                    injectStyles();
+                    createWidget();
+                    initializeWidget();
+                }
+            }
+            
+            init();
+        })();
+        // ========== WIDGET CODE END ==========
+    </script>
+    <!-- ========== COPY TO HERE FOR WIDGET.JS ========== -->
+    
+
 </body>
-    <script src="https://trejduu32-code.github.io/effective-journey/url.js"></script>
 </html>
