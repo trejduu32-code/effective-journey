@@ -6,7 +6,7 @@
             
             // Configuration (can be overridden by setting window.URLShortenerConfig)
             const defaultConfig = {
-                buttonImage: 'url.jpeg',
+                buttonImage: 'https://trejduu32-code.github.io/effective-journey/url.jpeg',
                 position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
                 apiEndpoint: 'https://tinyurl.com/api-create.php'
             };
@@ -261,3 +261,4 @@
     </script>
 
     <!-- ========== COPY TO HERE FOR WIDGET.JS ========== -->
+
