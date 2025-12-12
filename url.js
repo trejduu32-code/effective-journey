@@ -6,7 +6,7 @@
             
             // Configuration (can be overridden by setting window.URLShortenerConfig)
             const defaultConfig = {
-                buttonImage: 'https://cdn-ai.onspace.ai/onspace/project/uploads/GfmftsE7TKVnipUUBg4sNd/5963259a7_5a60156c-c371-4523-82a7-0845fe34cebb.jpeg',
+                buttonImage: 'url.jpeg',
                 position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
                 apiEndpoint: 'https://tinyurl.com/api-create.php'
             };
@@ -259,4 +259,5 @@
         })();
         // ========== WIDGET CODE END ==========
     </script>
+
     <!-- ========== COPY TO HERE FOR WIDGET.JS ========== -->
