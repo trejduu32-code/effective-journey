@@ -1,4 +1,3 @@
-
     <!-- ========== COPY FROM HERE FOR WIDGET.JS ========== -->
     <script>
         // ========== WIDGET CODE START ==========
@@ -81,6 +80,7 @@
                             
                             <div id="urlWidgetServiceUrlgpt" class="url-widget-service hidden">
                                 <div class="bg-white/5 rounded-lg p-3 mb-3">
+                                    <p class="text-gray-400 text-xs mb-2"><svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>Powered by URLGPT</p>
                                 </div>
                                 <iframe id="urlWidgetIframe" src="https://urlgpt.base44.app/Embed" style="width:100%;height:180px;border:none;border-radius:8px;background:transparent;" title="URLGpt Shortener"></iframe>
                             </div>
@@ -227,4 +227,3 @@
         // ========== WIDGET CODE END ==========
     </script>
     <!-- ========== COPY TO HERE FOR WIDGET.JS ========== -->
-    
